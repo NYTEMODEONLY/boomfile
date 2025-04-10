@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Boomfile Ruleset
+
+- Always check file structure and workspace directories to ensure we are not duplicating folder or files.
+- Only preform the specific task I request. 
