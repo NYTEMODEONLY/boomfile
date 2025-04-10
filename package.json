@@ -1,0 +1,21 @@
+{
+  "name": "boomfile",
+  "version": "1.0.0",
+  "description": "Temporary file hosting application with auto-deletion after 60 seconds",
+  "private": true,
+  "scripts": {
+    "dev:client": "cd client && npm start",
+    "dev:api": "vercel dev",
+    "dev": "npm run dev:api",
+    "build": "cd client && npm run build",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "fs-extra": "^11.3.0",
+    "multer": "^1.4.5-lts.2",
+    "uuid": "^11.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 
