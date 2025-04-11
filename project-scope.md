@@ -21,15 +21,16 @@ BoomFile is a web application that enables secure, temporary file sharing. Files
   - cors: For cross-origin resource sharing
   - fs-extra: For enhanced file system operations
   - uuid: For generating unique identifiers for files
+  - @vercel/blob: For file storage with auto-expiration
 - **Hosting**: Vercel Serverless Functions
 
 ### Data Flow
 1. User uploads a file via the drag-and-drop interface
 2. File is sent to the server via a POST request to a Vercel serverless function
-3. The function temporarily processes the file and stores it in `/tmp` directory (Vercel's writable temporary storage)
-4. Function generates a unique URL and schedules the file for deletion after 60 seconds
+3. The function processes the file and uploads it to Vercel Blob Storage with a 60-second expiration
+4. Function returns a direct URL to the file from Vercel Blob Storage
 5. Client displays the URL and a countdown timer
-6. File is automatically deleted when the timer expires
+6. File is automatically deleted by Vercel Blob when the expiration time is reached
 
 ## Component Structure
 
@@ -41,8 +42,7 @@ BoomFile is a web application that enables secure, temporary file sharing. Files
 ### Backend Components
 - **Serverless API**: Vercel serverless functions handling API requests
 - **Upload Handler**: Processes file uploads with Multer middleware
-- **File Serving**: Serves files based on their unique identifiers
-- **Auto-deletion**: Schedules and executes file deletion after 60 seconds
+- **Vercel Blob Storage**: Handles file storage with automatic expiration
 
 ## API Endpoints
 
@@ -50,18 +50,17 @@ BoomFile is a web application that enables secure, temporary file sharing. Files
 - `POST /api/upload`: Accepts file uploads and returns file metadata including:
   - fileId: Unique identifier for the file
   - filename: Original filename
-  - url: Shareable URL for the file
+  - url: Direct URL to the file in Vercel Blob Storage
   - expiresIn: Time in seconds until the file is deleted
-  
-- `GET /api/files/:filename`: Serves the uploaded file for download
 
 ## File Lifecycle
 
 1. **Upload**: User selects or drags a file into the upload area
 2. **Processing**: File is uploaded to Vercel serverless function and assigned a unique ID
-3. **Availability**: File is available for download via a unique URL
-4. **Countdown**: A 60-second countdown begins immediately after upload
-5. **Deletion**: File is automatically deleted from temporary storage
+3. **Storage**: File is stored in Vercel Blob Storage with a 60-second expiration time
+4. **Availability**: File is available for download via the direct Vercel Blob URL
+5. **Countdown**: A 60-second countdown begins immediately after upload
+6. **Deletion**: File is automatically deleted by Vercel Blob when the expiration time is reached
 
 ## Security Considerations
 
@@ -71,6 +70,7 @@ BoomFile is a web application that enables secure, temporary file sharing. Files
 - Server-side validation to prevent malicious uploads
 - Frontend validation for file selection
 - Vercel's built-in security features and HTTPS
+- Vercel Blob's secure storage with automatic expiration
 
 ## Deployment Requirements
 
@@ -80,6 +80,7 @@ BoomFile is a web application that enables secure, temporary file sharing. Files
   - Backend: Serverless functions in `/api` directory
 - **Environment Variables**:
   - API URL configuration for production/development environments
+  - Vercel Blob configuration variables
   - Other necessary configuration variables
 - **Vercel Build Settings**:
   - Build command: `npm run build`
@@ -87,8 +88,8 @@ BoomFile is a web application that enables secure, temporary file sharing. Files
   - Install command: `npm install`
 
 ### Storage Considerations
-- **Temporary Storage**: Limited to Vercel's `/tmp` directory (512MB limit)
-- **File Size Restrictions**: Implement size limits based on Vercel's payload limits
+- **Blob Storage**: Using Vercel Blob for file storage with auto-expiration
+- **File Size Restrictions**: Implement size limits (10MB limit)
 - **Function Execution Time**: Consider Vercel's serverless function timeout limits (default 10s)
 
 ## Development Workflow
@@ -119,10 +120,9 @@ BoomFile is a web application that enables secure, temporary file sharing. Files
 1. No persistent storage of upload history
 2. Limited to single file uploads
 3. No file type restrictions or validation
-4. Vercel serverless function limitations (512MB `/tmp` storage, execution timeout)
+4. Vercel serverless function limitations
 5. No built-in monitoring or analytics beyond what Vercel provides
 6. URLs are not customizable
-7. Serverless architecture may impact file handling for larger files
 
 ## Conclusion
 

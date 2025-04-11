@@ -11,6 +11,7 @@
     "deploy": "vercel --prod"
   },
   "dependencies": {
+    "@vercel/blob": "^1.0.0",
     "fs-extra": "^11.3.0",
     "multer": "^1.4.5-lts.2",
     "uuid": "^11.1.0"
@@ -18,4 +19,4 @@
   "engines": {
     "node": ">=18.0.0"
   }
-} 
+}

@@ -1,8 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
-import fs from 'fs-extra';
 import path from 'node:path';
-import os from 'node:os';
+import { put } from '@vercel/blob';
 
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
@@ -57,34 +56,23 @@ export default async function handler(req, res) {
     const fileExtension = path.extname(req.file.originalname);
     const filename = `${uniqueId}${fileExtension}`;
     
-    // Get temporary file path
-    const tmpDir = os.tmpdir();
-    const filePath = path.join(tmpDir, filename);
+    // Set expiration time - 60 seconds from now
+    const expiresAt = new Date(Date.now() + 60 * 1000);
     
-    // Write file to temporary directory
-    await fs.writeFile(filePath, req.file.buffer);
-    
-    // Set timer to delete the file after 60 seconds
-    setTimeout(async () => {
-      try {
-        await fs.unlink(filePath);
-        console.log(`File deleted: ${filePath}`);
-      } catch (err) {
-        console.error(`Error deleting file: ${filePath}`, err);
-      }
-    }, 60 * 1000);
-
-    // Generate the file URL
-    const host = req.headers.host;
-    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-    const fileUrl = `${protocol}://${host}/api/files/${filename}`;
+    // Upload to Vercel Blob
+    const blob = await put(filename, req.file.buffer, {
+      access: 'public',
+      addRandomSuffix: false,
+      contentType: req.file.mimetype,
+      expiresAt
+    });
 
     // Return success response
     return res.status(200).json({
       message: 'File uploaded successfully',
       fileId: uniqueId,
       filename: req.file.originalname,
-      url: fileUrl,
+      url: blob.url,
       expiresIn: 60 // seconds
     });
   } catch (error) {

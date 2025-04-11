@@ -14,7 +14,7 @@ BoomFile is a simple file hosting web application that destroys uploaded files a
 
 - **Frontend**: React with TypeScript
 - **Backend**: Vercel Serverless Functions
-- **File Handling**: Temporary storage in Vercel's `/tmp` directory
+- **File Storage**: Vercel Blob Storage with auto-expiration
 - **Deployment**: Vercel Platform
 
 ## Project Structure
@@ -22,8 +22,7 @@ BoomFile is a simple file hosting web application that destroys uploaded files a
 ```
 boomfile/
 ├── api/                # Vercel Serverless Functions
-│   ├── files/          # File serving endpoint
-│   └── upload.js       # File upload endpoint
+│   └── upload.js       # File upload endpoint with Vercel Blob
 ├── client/             # React frontend
 │   ├── public/         # Static files
 │   └── src/            # React source code
@@ -39,6 +38,7 @@ boomfile/
 - Node.js (v18+ recommended)
 - npm or yarn
 - Vercel CLI (`npm install -g vercel`)
+- Vercel account with Blob Storage enabled
 
 ### Installation
 
@@ -82,12 +82,12 @@ Or manually deploy through the Vercel dashboard by connecting your GitHub reposi
 
 ## Vercel Configuration
 
-The application uses Vercel's serverless functions and routing configuration:
+The application uses Vercel's platform features:
 
 - The frontend is built from the `client` directory
 - API routes are implemented as serverless functions
-- Files are temporarily stored in Vercel's `/tmp` directory
-- Automatic cleanup happens after 60 seconds
+- Files are stored in Vercel Blob Storage with 60-second expiration
+- Automatic cleanup happens when Blob objects expire
 
 ## License
 
