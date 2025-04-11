@@ -47,7 +47,19 @@ const FileUpload: React.FC<FileUploadProps> = ({ setUploadedFile }) => {
     }
   }, [setUploadedFile]);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
+    onDrop,
+    maxSize: 10485760, // 10MB in bytes
+    multiple: false,
+    accept: {
+      'image/*': [],
+      'application/pdf': [],
+      'text/*': [],
+      'application/zip': [],
+      'application/vnd.openxmlformats-officedocument.*': [],
+      'application/msword': [],
+    }
+  });
 
   return (
     <div className="file-upload-container">
@@ -58,15 +70,32 @@ const FileUpload: React.FC<FileUploadProps> = ({ setUploadedFile }) => {
         <input {...getInputProps()} />
         {isUploading ? (
           <div className="uploading-indicator">
-            <p>Uploading...</p>
+            <div className="spinner" />
+            <p>Uploading your file...</p>
           </div>
         ) : (
           <div className="dropzone-content">
+            <svg 
+              width="80" 
+              height="80" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              className="upload-icon"
+              aria-label="Upload icon"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
             <p>{isDragActive 
               ? 'Drop the file here...' 
               : 'Drag & drop a file here, or click to select a file'}
             </p>
-            <p className="file-note">The file will be deleted after 60 seconds</p>
+            <p className="file-note">File will be deleted after 60 seconds • Max size: 10MB</p>
           </div>
         )}
       </div>
