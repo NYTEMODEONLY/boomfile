@@ -55,16 +55,23 @@ export default async function handler(req, res) {
     const uniqueId = uuidv4();
     const fileExtension = path.extname(req.file.originalname);
     const filename = `${uniqueId}${fileExtension}`;
-    
+
     // Set expiration time - 60 seconds from now
-    const expiresAt = new Date(Date.now() + 60 * 1000);
-    
-    // Upload to Vercel Blob
+    const uploadTime = Date.now();
+    const expirationTime = uploadTime + 60 * 1000;
+    const expiresAt = new Date(expirationTime);
+
+    // Upload to Vercel Blob with metadata for cron cleanup
     const blob = await put(filename, req.file.buffer, {
       access: 'public',
       addRandomSuffix: false,
       contentType: req.file.mimetype,
-      expiresAt
+      cacheControlMaxAge: 60, // Cache for 60 seconds max
+      metadata: {
+        uploadedAt: uploadTime.toString(),
+        expiresAt: expirationTime.toString(),
+        originalName: req.file.originalname
+      }
     });
 
     // Return success response
