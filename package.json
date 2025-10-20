@@ -1,6 +1,7 @@
 {
   "name": "boomfile",
   "version": "1.0.0",
+  "type": "module",
   "description": "Temporary file hosting application with auto-deletion after 60 seconds",
   "private": true,
   "scripts": {
