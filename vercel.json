@@ -2,10 +2,20 @@
   "version": 2,
   "buildCommand": "cd client && npm install && npm run build",
   "outputDirectory": "client/build",
+  "crons": [
+    {
+      "path": "/api/cron/cleanup",
+      "schedule": "* * * * *"
+    }
+  ],
   "routes": [
     {
       "src": "/api/upload",
       "dest": "/api/upload.js"
+    },
+    {
+      "src": "/api/cron/cleanup",
+      "dest": "/api/cron/cleanup.js"
     },
     {
       "src": "/(.*)",
